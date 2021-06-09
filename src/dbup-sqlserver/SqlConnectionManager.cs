@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using DbUp.Engine.Transactions;
 using DbUp.Support;
@@ -15,15 +15,21 @@ namespace DbUp.SqlServer
         /// </summary>
         /// <param name="connectionString"></param>
         public SqlConnectionManager(string connectionString)
-             : base(new DelegateConnectionFactory((log, dbManager) =>
-             {
-                 var conn = new SqlConnection(connectionString);
+            : this(new SqlConnection(connectionString))
+        { }
 
-                 if (dbManager.IsScriptOutputLogged)
-                     conn.InfoMessage += (sender, e) => log.LogInformation($"{{0}}", e.Message);
+        /// <summary>
+        /// Manages Sql Database Connections using an existing connection.
+        /// </summary>
+        /// <param name="connection">The existing SQL connection to use.</param>
+        public SqlConnectionManager(SqlConnection connection)
+            : base(new DelegateConnectionFactory((log, dbManager) =>
+            {
+                if (dbManager.IsScriptOutputLogged)
+                    connection.InfoMessage += (sender, e) => log.LogInformation($"{{0}}", e.Message);
 
-                 return conn;
-             }))
+                return connection;
+            }))
         { }
 
         /// <inheritdoc/>
