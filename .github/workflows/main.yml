@@ -27,6 +27,9 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.0.x
+          
+      - name: Install NuGet
+        uses: NuGet/setup-nuget@v1.2.0
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
@@ -61,7 +64,7 @@ jobs:
         working-directory: src
         
       - name: Pack placeholder dbup package
-        run: dotnet pack ./dbup/dbup.nuspec -OutputDirectory ../artifacts -Version $env:GitVersion_SemVer
+        run: nuget pack ./dbup/dbup.nuspec -OutputDirectory ../artifacts -Version $env:GitVersion_SemVer
         working-directory: src
 
       - name: Push NuGet packages to GitHub Packages ⬆️
