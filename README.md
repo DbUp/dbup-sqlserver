@@ -1,4 +1,4 @@
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/DbUp/dbup-sqlserver/CI/main)](https://github.com/DbUp/dbup-sqlserver/actions/workflows/main.yml?query=branch%3Amain)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/DbUp/dbup-sqlserver/main.yml?branch=main)](https://github.com/DbUp/dbup-sqlserver/actions/workflows/main.yml?query=branch%3Amain)
 [![NuGet](https://img.shields.io/nuget/dt/dbup-sqlserver.svg)](https://www.nuget.org/packages/dbup-sqlserver)
 [![NuGet](https://img.shields.io/nuget/v/dbup-sqlserver.svg)](https://www.nuget.org/packages/dbup-sqlserver)
 [![Prerelease](https://img.shields.io/nuget/vpre/dbup-sqlserver?color=orange&label=prerelease)](https://www.nuget.org/packages/dbup-sqlserver)

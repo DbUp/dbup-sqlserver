@@ -59,6 +59,10 @@ jobs:
       - name: Pack
         run: dotnet pack --no-build -c Release -o ../artifacts /p:Version=$env:GitVersion_SemVer
         working-directory: src
+        
+      - name: Pack placeholder dbup package
+        run: dotnet pack ./dbup/dbup.nuspec -OutputDirectory ../artifacts -Version $env:GitVersion_SemVer
+        working-directory: src
 
       - name: Push NuGet packages to GitHub Packages ⬆️
         working-directory: artifacts
