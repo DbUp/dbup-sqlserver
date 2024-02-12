@@ -24,21 +24,21 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <Reference Include="System.Data" />
     <Reference Include="System" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
-
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
