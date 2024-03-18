@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Data;
-#if SUPPORTS_MICROSOFT_SQL_CLIENT
 using Microsoft.Data.SqlClient;
-#else
-using System.Data.SqlClient;
-#endif
 using DbUp;
 using DbUp.Builder;
 using DbUp.Engine.Output;
@@ -48,7 +44,6 @@ public static class SqlServerExtensions
         return SqlDatabase(new SqlConnectionManager(connectionString), schema);
     }
 
-#if SUPPORTS_AZURE_AD
     /// <summary>Creates an upgrader for SQL Server databases.</summary>
     /// <param name="supported">Fluent helper type.</param>
     /// <param name="connectionString">The connection string.</param>
@@ -65,7 +60,6 @@ public static class SqlServerExtensions
 
         return supported.SqlDatabase(new SqlConnectionManager(connectionString), schema);
     }
-#endif
 
     /// <summary>
     /// Creates an upgrader for SQL Server databases.
@@ -110,20 +104,6 @@ public static class SqlServerExtensions
         builder.Configure(c => c.Journal = new SqlTableJournal(() => c.ConnectionManager, () => c.Log, schema, table));
         return builder;
     }
-
-#if SUPPORTS_SQL_CONTEXT
-    /// <summary>
-    /// Logs to SqlContext.Pipe, for use with "context connection=true".
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <returns>
-    /// The same builder
-    /// </returns>
-    public static UpgradeEngineBuilder LogToSqlContext(this UpgradeEngineBuilder builder)
-    {
-        return builder.LogTo(new SqlContextUpgradeLog());
-    }
-#endif
 
     /// <summary>
     /// Ensures that the database specified in the connection string exists.
@@ -296,7 +276,7 @@ public static class SqlServerExtensions
                 command.ExecuteNonQuery();
             }
 
-            logger.WriteInformation(@"Created database {0}", databaseName);
+            logger.LogInformation(@"Created database {0}", databaseName);
         }
     }
 
@@ -312,7 +292,7 @@ public static class SqlServerExtensions
         }
         catch
         {
-            logger.WriteInformation("Could not connect to the database directly");
+            logger.LogInformation("Could not connect to the database directly");
             return false;
         }
     }
@@ -364,7 +344,7 @@ public static class SqlServerExtensions
                 command.ExecuteNonQuery();
             }
 
-            logger.WriteInformation("Dropped database {0}", databaseName);
+            logger.LogInformation("Dropped database {0}", databaseName);
         }
     }
 
@@ -388,7 +368,7 @@ public static class SqlServerExtensions
             Password = "******"
         };
 
-        logger.WriteInformation("Master ConnectionString => {0}", logMasterConnectionStringBuilder.ConnectionString);
+        logger.LogInformation("Master ConnectionString => {0}", logMasterConnectionStringBuilder.ConnectionString);
         masterConnectionString = masterConnectionStringBuilder.ConnectionString;
     }
 

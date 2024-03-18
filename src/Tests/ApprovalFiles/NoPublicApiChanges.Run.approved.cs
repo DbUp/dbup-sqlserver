@@ -1,4 +1,4 @@
-﻿[assembly: System.CLSCompliantAttribute(true)]
+[assembly: System.CLSCompliantAttribute(true)]
 [assembly: System.Runtime.InteropServices.ComVisibleAttribute(false)]
 [assembly: System.Runtime.InteropServices.GuidAttribute("8190b40b-ac5b-414f-8a00-9b6a2c12b010")]
 
@@ -11,7 +11,6 @@ public static class AzureSqlServerExtensions
 public static class SqlServerExtensions
 {
     public static DbUp.Builder.UpgradeEngineBuilder JournalToSqlTable(this DbUp.Builder.UpgradeEngineBuilder builder, string schema, string table) { }
-    public static DbUp.Builder.UpgradeEngineBuilder LogToSqlContext(this DbUp.Builder.UpgradeEngineBuilder builder) { }
     public static DbUp.Builder.UpgradeEngineBuilder SqlDatabase(this DbUp.Builder.SupportedDatabases supported, string connectionString) { }
     public static DbUp.Builder.UpgradeEngineBuilder SqlDatabase(this DbUp.Builder.SupportedDatabases supported, string connectionString, string schema) { }
     public static DbUp.Builder.UpgradeEngineBuilder SqlDatabase(this DbUp.Builder.SupportedDatabases supported, DbUp.Engine.Transactions.IConnectionManager connectionManager, string schema = null) { }
@@ -75,7 +74,7 @@ namespace DbUp.SqlServer.Helpers
     public class TemporarySqlDatabase : System.IDisposable
     {
         public TemporarySqlDatabase(string name) { }
-        public TemporarySqlDatabase(System.Data.SqlClient.SqlConnectionStringBuilder connectionStringBuilder) { }
+        public TemporarySqlDatabase(Microsoft.Data.SqlClient.SqlConnectionStringBuilder connectionStringBuilder) { }
         public TemporarySqlDatabase(string name, string instanceName) { }
         public DbUp.Helpers.AdHocSqlRunner AdHoc { get; }
         public string ConnectionString { get; }
