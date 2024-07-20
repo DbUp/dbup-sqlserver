@@ -6,7 +6,7 @@
     <Company>DbUp Contributors</Company>
     <Product>DbUp</Product>
     <Copyright>Copyright © DbUp Contributors 2015</Copyright>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;net462;net6.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>dbup-sqlserver</AssemblyName>
     <RootNamespace>DbUp.SqlServer</RootNamespace>
     <PackageId>dbup-sqlserver</PackageId>
@@ -16,43 +16,19 @@
     <PackageIcon>dbup-icon.png</PackageIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(CI)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild> <!-- Perform a deterministic build, so our binaries aren't impacted by build server environmental factors (e.g. file paths). -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources> <!-- Embed source files that are not tracked by the source control manager in the PDB -->
+    <DebugType>embedded</DebugType> <!-- Recommended: Embed symbols containing Source Link in the main file (exe/dll) -->
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="dbup-core" Version="5.0.37"/>
+    <PackageReference Include="dbup-core" Version="6.0.0-beta.108"/>
     <PackageReference Include="System.Net.Security" Version="4.3.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <Reference Include="System.Data" />
-    <Reference Include="System" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.1" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.4" />
-    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
-  </ItemGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net462'">
-    <DefineConstants>$(DefineConstants);SUPPORTS_SQL_CONTEXT;SUPPORTS_AZURE_AD</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net6.0'">
-    <DefineConstants>$(DefineConstants);SUPPORTS_AZURE_AD</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
-     <DefineConstants>$(DefineConstants);SUPPORTS_MICROSOFT_SQL_CLIENT</DefineConstants>
-  </PropertyGroup>
-  
   <ItemGroup>
     <None Visible="false" Include="../dbup-icon.png" Pack="True" PackagePath=""/>
   </ItemGroup>

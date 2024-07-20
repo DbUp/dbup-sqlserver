@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
 using DbUp.Engine;
 using DbUp.Engine.Output;
@@ -18,7 +16,8 @@ namespace DbUp.SqlServer.Tests
         [Fact]
         public void verify_schema_should_not_check_when_schema_is_null()
         {
-            var executor = new SqlScriptExecutor(() => Substitute.For<IConnectionManager>(), () => null, null, () => false, null, () => Substitute.For<IJournal>());
+            var executor = new SqlScriptExecutor(() => Substitute.For<IConnectionManager>(), () => null, null,
+                () => false, null, () => Substitute.For<IJournal>());
 
             executor.VerifySchema();
         }
@@ -26,10 +25,8 @@ namespace DbUp.SqlServer.Tests
         [Fact]
         public void when_schema_is_null_schema_is_stripped_from_scripts()
         {
-            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command);
 
             executor.Execute(new SqlScript("Test", "create $schema$.Table"));
 
@@ -40,12 +37,11 @@ namespace DbUp.SqlServer.Tests
         [Fact]
         public void uses_variable_substitute_preprocessor_when_running_scripts()
         {
-            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command);
 
-            executor.Execute(new SqlScript("Test", "create $foo$.Table"), new Dictionary<string, string> { { "foo", "bar" } });
+            executor.Execute(new SqlScript("Test", "create $foo$.Table"),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe("create bar.Table");
@@ -58,12 +54,11 @@ namespace DbUp.SqlServer.Tests
                                   create $foo$.Table";
             var oneLineCommentResult = @"--from excel $A$6
                                   create bar.Table";
-            var dbConnection = Substitute.For<IDbConnection>();
-            var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
 
-            executor.Execute(new SqlScript("Test", oneLineComment), new Dictionary<string, string> { { "foo", "bar" } });
+            var command = Substitute.For<IDbCommand>();
+            var executor = GetSqlScriptExecutor(command);
+            executor.Execute(new SqlScript("Test", oneLineComment),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe(oneLineCommentResult);
@@ -76,12 +71,14 @@ namespace DbUp.SqlServer.Tests
                                   create $foo$.Table";
             var oneLineCommentResult = @"/* from excel $A$6 */
                                   create bar.Table";
-            var dbConnection = Substitute.For<IDbConnection>();
-            var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
 
-            executor.Execute(new SqlScript("Test", oneLineComment), new Dictionary<string, string> { { "foo", "bar" } });
+            var command = Substitute.For<IDbCommand>();
+            var executor = GetSqlScriptExecutor(command);
+            executor.Execute(new SqlScript("Test", oneLineComment),
+                new Dictionary<string, string> { { "foo", "bar" } });
+
+            executor.Execute(new SqlScript("Test", oneLineComment),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe(oneLineCommentResult);
@@ -101,12 +98,13 @@ namespace DbUp.SqlServer.Tests
                                         from excel $A$6 
                                         some comment
                                       */
-                                  create bar.Table"; var dbConnection = Substitute.For<IDbConnection>();
+                                  create bar.Table";
+            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command);
 
-            executor.Execute(new SqlScript("Test", multiLineComment), new Dictionary<string, string> { { "foo", "bar" } });
+            executor.Execute(new SqlScript("Test", multiLineComment),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe(multiLineCommentResult);
@@ -126,12 +124,13 @@ namespace DbUp.SqlServer.Tests
                                         --from excel $A$6 
                                         some comment
                                       */
-                                  create bar.Table"; var dbConnection = Substitute.For<IDbConnection>();
+                                  create bar.Table";
+            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command);
 
-            executor.Execute(new SqlScript("Test", multiLineComment), new Dictionary<string, string> { { "foo", "bar" } });
+            executor.Execute(new SqlScript("Test", multiLineComment),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe(multiLineCommentResult);
@@ -151,12 +150,13 @@ namespace DbUp.SqlServer.Tests
                                         /* from excel $A$6 */
                                         some comment
                                       */
-                                  create bar.Table"; var dbConnection = Substitute.For<IDbConnection>();
+                                  create bar.Table";
+            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command);
 
-            executor.Execute(new SqlScript("Test", multiLineComment), new Dictionary<string, string> { { "foo", "bar" } });
+            executor.Execute(new SqlScript("Test", multiLineComment),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe(multiLineCommentResult);
@@ -165,24 +165,22 @@ namespace DbUp.SqlServer.Tests
         [Fact]
         public void does_not_use_variable_substitute_preprocessor_when_setting_false()
         {
-            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), null, () => false, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command, variablesEnabled: false);
 
-            executor.Execute(new SqlScript("Test", "create $foo$.Table"), new Dictionary<string, string> { { "foo", "bar" } });
+            executor.Execute(new SqlScript("Test", "create $foo$.Table"),
+                new Dictionary<string, string> { { "foo", "bar" } });
 
             command.Received().ExecuteNonQuery();
             command.CommandText.ShouldBe("create $foo$.Table");
         }
 
+
         [Fact]
         public void uses_variable_subtitutes_schema()
         {
-            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => new ConsoleUpgradeLog(), "foo", () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command, schema: "foo");
 
             executor.Execute(new SqlScript("Test", "create $schema$.Table"));
 
@@ -193,7 +191,6 @@ namespace DbUp.SqlServer.Tests
         [Fact]
         public void logs_output_when_configured_to()
         {
-            var dbConnection = Substitute.For<IDbConnection>();
             var command = Substitute.For<IDbCommand>();
 
             var reader = Substitute.For<IDataReader>();
@@ -210,31 +207,22 @@ namespace DbUp.SqlServer.Tests
             command.ExecuteReader().Returns(reader);
 
             var logger = new CaptureLogsLogger();
-            dbConnection.CreateCommand().Returns(command);
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true) { IsScriptOutputLogged = true },
-                                                 () => logger,
-                                                 "foo",
-                                                 () => true,
-                                                 null,
-                                                 () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command, log: logger, schema: "foo", isScriptOutputLogged: true);
 
             executor.Execute(new SqlScript("Test", "SELECT * FROM $schema$.[Table]"));
 
-            command.Received().ExecuteReader();
+            command.ReceivedWithAnyArgs().ExecuteReader();
             command.DidNotReceive().ExecuteNonQuery();
             command.CommandText.ShouldBe("SELECT * FROM [foo].[Table]");
 
             logger.Log.Trim()
-                      .ShouldBe(string.Join(Environment.NewLine, new[]
-                      {
-                          "Info:         Executing Database Server script 'Test'",
-                          "Info:         -------------",
-                          "Info:         | One | Two |",
-                          "Info:         -------------",
-                          "Info:         |   A |   B |",
-                          "Info:         -------------",
-                          "Info:"
-                      }));
+                .ShouldBe(string.Join(Environment.NewLine,
+                    new[]
+                    {
+                        "Info:         Executing Database Server script 'Test'", "Info:         -------------",
+                        "Info:         | One | Two |", "Info:         -------------", "Info:         |   A |   B |",
+                        "Info:         -------------", "Info:"
+                    }));
         }
 
         [Fact]
@@ -250,14 +238,34 @@ namespace DbUp.SqlServer.Tests
             });
             dbConnection.CreateCommand().Returns(command);
             var logger = Substitute.For<IUpgradeLog>();
-            logger.WhenForAnyArgs(x => x.WriteError(null, null)).Do(x => Console.WriteLine(x.Arg<string>(), x.Arg<object[]>()));
+            logger.WhenForAnyArgs(x => x.LogError(null, (object[]?)null))
+                .Do(x => Console.WriteLine(x.Arg<string>(), x.Arg<object[]>()));
 
-            var executor = new SqlScriptExecutor(() => new TestConnectionManager(dbConnection, true), () => logger, null, () => true, null, () => Substitute.For<IJournal>());
+            var executor = GetSqlScriptExecutor(command, log: logger);
 
             Action exec = () => executor.Execute(new SqlScript("Test", "create $schema$.Table"));
             exec.ShouldThrow<DbException>();
             command.Received().ExecuteNonQuery();
-            logger.ReceivedWithAnyArgs().WriteError("", null);
+            logger.ReceivedWithAnyArgs().LogError("", null);
+        }
+
+        static SqlScriptExecutor GetSqlScriptExecutor(
+            IDbCommand command,
+            bool variablesEnabled = true,
+            string? schema = null,
+            IUpgradeLog? log = null,
+            bool isScriptOutputLogged = false
+        )
+        {
+            var dbConnection = Substitute.For<IDbConnection>();
+            dbConnection.CreateCommand().Returns(command);
+            var testConnectionManager = new TestConnectionManager(dbConnection) { IsScriptOutputLogged = isScriptOutputLogged };
+            log ??= new ConsoleUpgradeLog();
+            testConnectionManager.OperationStarting(log, []);
+
+            var executor = new SqlScriptExecutor(() => testConnectionManager, () => log, schema, () => variablesEnabled,
+                null, () => Substitute.For<IJournal>());
+            return executor;
         }
     }
 }
