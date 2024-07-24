@@ -374,11 +374,8 @@ public static class SqlServerExtensions
 
     static bool DatabaseExists(SqlConnection connection, string databaseName)
     {
-        var sqlCommandText = string.Format
-        (
-            @"SELECT TOP 1 case WHEN dbid IS NOT NULL THEN 1 ELSE 0 end FROM sys.sysdatabases WHERE name = '{0}';",
-            databaseName
-        );
+        var sqlCommandText =
+            $@"SELECT TOP 1 case WHEN dbid IS NOT NULL THEN 1 ELSE 0 end FROM sys.sysdatabases WHERE name = '{databaseName}';";
 
         // check to see if the database already exists..
         using (var command = new SqlCommand(sqlCommandText, connection)
