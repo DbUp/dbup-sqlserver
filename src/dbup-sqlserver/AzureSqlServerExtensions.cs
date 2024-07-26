@@ -2,8 +2,6 @@
 using DbUp.Builder;
 using DbUp.SqlServer;
 
-#if SUPPORTS_AZURE_AD
-
 /// <summary>Configuration extension methods for Azure SQL Server.</summary>
 // NOTE: DO NOT MOVE THIS TO A NAMESPACE
 // Since the class just contains extension methods, we leave it in the global:: namespace so that it is always available
@@ -45,5 +43,3 @@ public static class AzureSqlServerExtensions
     }
 }
 #pragma warning restore CA1050 // Declare types in namespaces
-
-#endif
