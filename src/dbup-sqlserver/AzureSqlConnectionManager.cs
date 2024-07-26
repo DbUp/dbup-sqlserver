@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-
 using Microsoft.Data.SqlClient;
 using DbUp.Engine.Transactions;
 using DbUp.Support;
-
-using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Identity;
+using Azure.Core;
 
 namespace DbUp.SqlServer;
 
@@ -22,12 +21,11 @@ public class AzureSqlConnectionManager : DatabaseConnectionManager
     public AzureSqlConnectionManager(string connectionString, string resource, string tenantId, string azureAdInstance = "https://login.microsoftonline.com/")
         : base(new DelegateConnectionFactory((log, dbManager) =>
         {
+                var tokenProvider = new DefaultAzureCredential();
+                var tokenContext = new TokenRequestContext(scopes: new string[] { resource + "/.default" }, tenantId: tenantId);
             var conn = new SqlConnection(connectionString)
             {
-                AccessToken = new AzureServiceTokenProvider(azureAdInstance: azureAdInstance).GetAccessTokenAsync(resource, tenantId)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult()
+                    AccessToken = tokenProvider.GetToken(tokenContext).Token
             };
 
             if (dbManager.IsScriptOutputLogged)
