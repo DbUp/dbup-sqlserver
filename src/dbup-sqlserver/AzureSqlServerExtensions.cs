@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Azure.Core;
+using Azure.Identity;
 using DbUp.Builder;
 using DbUp.SqlServer;
 
@@ -13,33 +14,21 @@ public static class AzureSqlServerExtensions
     /// <param name="supported">Fluent helper type.</param>
     /// <param name="connectionString">The connection string.</param>
     /// <param name="schema">The SQL schema name to use. Defaults to 'dbo' if <see langword="null" />.</param>
-    /// <returns>A builder for a database upgrader designed for Azure SQL Server databases.</returns>
-    public static UpgradeEngineBuilder AzureSqlDatabaseWithIntegratedSecurity(this SupportedDatabases supported, string connectionString, string schema)
-    {
-        return supported.SqlDatabase(new AzureSqlConnectionManager(connectionString), schema);
-    }
-
-    /// <summary>Creates an upgrader for Azure SQL Databases using Azure AD Integrated Security.</summary>
-    /// <param name="supported">Fluent helper type.</param>
-    /// <param name="connectionString">The connection string.</param>
-    /// <param name="schema">The SQL schema name to use. Defaults to 'dbo' if <see langword="null" />.</param>
-    /// <returns>A builder for a database upgrader designed for Azure SQL Server databases.</returns>
-    public static UpgradeEngineBuilder AzureSqlDatabaseWithIntegratedSecurity(this SupportedDatabases supported, string connectionString, string schema, string resource)
-    {
-        return AzureSqlDatabaseWithIntegratedSecurity(supported, connectionString, schema, resource, null);
-    }
-
-    /// <summary>Creates an upgrader for Azure SQL Databases using Azure AD Integrated Security.</summary>
-    /// <param name="supported">Fluent helper type.</param>
-    /// <param name="connectionString">The connection string.</param>
-    /// <param name="schema">The SQL schema name to use. Defaults to 'dbo' if <see langword="null" />.</param>
-    /// <param name="resource">Resource to access. e.g. https://management.azure.com/.</param>
+    /// <param name="tokenCredential">The credentials used. If null, 'DefaultAzureCredential' is used.</param>
+    /// <param name="resource">Resource to access. e.g. https://database.windows.net/.</param>
     /// <param name="tenantId">If not specified, default tenant is used. Managed Service Identity REST protocols do not accept tenantId, so this can only be used with certificate and client secret based authentication.</param>
-    /// <param name="azureAdInstance">Specify a value for clouds other than the Public Cloud.</param>
     /// <returns>A builder for a database upgrader designed for Azure SQL Server databases.</returns>
-    public static UpgradeEngineBuilder AzureSqlDatabaseWithIntegratedSecurity(this SupportedDatabases supported, string connectionString, string schema, string resource, string tenantId, string azureAdInstance = "https://login.microsoftonline.com/")
+    public static UpgradeEngineBuilder AzureSqlDatabaseWithIntegratedSecurity(
+        this SupportedDatabases supported, 
+        string connectionString, 
+        string schema = null, 
+        TokenCredential tokenCredential = null,
+        string resource = "https://database.windows.net/",
+        string tenantId = null
+    )
     {
-        return supported.SqlDatabase(new AzureSqlConnectionManager(connectionString, resource, tenantId, azureAdInstance), schema);
+        return supported.SqlDatabase(
+            new AzureSqlConnectionManager(connectionString, tokenCredential ?? new DefaultAzureCredential(), resource, tenantId), schema);
     }
 }
 #pragma warning restore CA1050 // Declare types in namespaces
