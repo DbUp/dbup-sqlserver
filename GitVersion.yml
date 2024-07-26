@@ -1,3 +1,2 @@
 mode: Mainline
-ignore:
-  sha: [4b3e9a27e5eabcd29690321ce1a1ae20d0d85afb]
+next-version: 6.0.0
