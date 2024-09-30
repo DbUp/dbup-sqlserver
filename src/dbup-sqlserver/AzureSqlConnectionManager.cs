@@ -1,33 +1,29 @@
 ﻿using System.Collections.Generic;
-
+using System.Threading;
 using Microsoft.Data.SqlClient;
 using DbUp.Engine.Transactions;
 using DbUp.Support;
-
-using Microsoft.Azure.Services.AppAuthentication;
+using Azure.Core;
+using Azure.Identity;
 
 namespace DbUp.SqlServer;
 
 /// <summary>Manages an Azure Sql Server database connection.</summary>
 public class AzureSqlConnectionManager : DatabaseConnectionManager
 {
-    public AzureSqlConnectionManager(string connectionString)
-        : this(connectionString, "https://database.windows.net/", null)
-    { }
-
-    public AzureSqlConnectionManager(string connectionString, string resource)
-        : this(connectionString, resource, null)
-    { }
-
-    public AzureSqlConnectionManager(string connectionString, string resource, string tenantId, string azureAdInstance = "https://login.microsoftonline.com/")
+    public AzureSqlConnectionManager(
+        string connectionString,
+        TokenCredential tokenCredential,
+        string resource = "https://database.windows.net/",
+        string tenantId = null
+    )
         : base(new DelegateConnectionFactory((log, dbManager) =>
         {
+            var tokenContext =
+                new TokenRequestContext(scopes: new string[] { resource + "/.default" }, tenantId: tenantId);
             var conn = new SqlConnection(connectionString)
             {
-                AccessToken = new AzureServiceTokenProvider(azureAdInstance: azureAdInstance).GetAccessTokenAsync(resource, tenantId)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult()
+                AccessToken = tokenCredential.GetToken(tokenContext, CancellationToken.None).Token
             };
 
             if (dbManager.IsScriptOutputLogged)
@@ -35,7 +31,8 @@ public class AzureSqlConnectionManager : DatabaseConnectionManager
 
             return conn;
         }))
-    { }
+    {
+    }
 
     public override IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
     {
