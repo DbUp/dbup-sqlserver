@@ -1,54 +1,43 @@
 ﻿using System.Collections.Generic;
-
-#if SUPPORTS_MICROSOFT_SQL_CLIENT
+using System.Threading;
 using Microsoft.Data.SqlClient;
-#else
-using System.Data.SqlClient;
-#endif
-
 using DbUp.Engine.Transactions;
 using DbUp.Support;
+using Azure.Core;
+using Azure.Identity;
 
-#if SUPPORTS_AZURE_AD
-using Microsoft.Azure.Services.AppAuthentication;
+namespace DbUp.SqlServer;
 
-namespace DbUp.SqlServer
+/// <summary>Manages an Azure Sql Server database connection.</summary>
+public class AzureSqlConnectionManager : DatabaseConnectionManager
 {
-    /// <summary>Manages an Azure Sql Server database connection.</summary>
-    public class AzureSqlConnectionManager : DatabaseConnectionManager
-    {
-        public AzureSqlConnectionManager(string connectionString)
-            : this(connectionString, "https://database.windows.net/", null)
-        { }
-
-        public AzureSqlConnectionManager(string connectionString, string resource)
-            : this(connectionString, resource, null)
-        { }
-
-        public AzureSqlConnectionManager(string connectionString, string resource, string tenantId, string azureAdInstance = "https://login.microsoftonline.com/")
-            : base(new DelegateConnectionFactory((log, dbManager) =>
-            {
-                var conn = new SqlConnection(connectionString)
-                {
-                    AccessToken = new AzureServiceTokenProvider(azureAdInstance: azureAdInstance).GetAccessTokenAsync(resource, tenantId)
-                                                                                                 .ConfigureAwait(false)
-                                                                                                 .GetAwaiter()
-                                                                                                 .GetResult()
-                };
-
-                if (dbManager.IsScriptOutputLogged)
-                    conn.InfoMessage += (sender, e) => log.WriteInformation($"{{0}}", e.Message);
-
-                return conn;
-            }))
-        { }
-
-        public override IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
+    public AzureSqlConnectionManager(
+        string connectionString,
+        TokenCredential tokenCredential,
+        string resource = "https://database.windows.net/",
+        string tenantId = null
+    )
+        : base(new DelegateConnectionFactory((log, dbManager) =>
         {
-            var commandSplitter = new SqlCommandSplitter();
-            var scriptStatements = commandSplitter.SplitScriptIntoCommands(scriptContents);
-            return scriptStatements;
-        }
+            var tokenContext =
+                new TokenRequestContext(scopes: new string[] { resource + "/.default" }, tenantId: tenantId);
+            var conn = new SqlConnection(connectionString)
+            {
+                AccessToken = tokenCredential.GetToken(tokenContext, CancellationToken.None).Token
+            };
+
+            if (dbManager.IsScriptOutputLogged)
+                conn.InfoMessage += (sender, e) => log.LogInformation($"{{0}}", e.Message);
+
+            return conn;
+        }))
+    {
+    }
+
+    public override IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
+    {
+        var commandSplitter = new SqlCommandSplitter();
+        var scriptStatements = commandSplitter.SplitScriptIntoCommands(scriptContents);
+        return scriptStatements;
     }
 }
-#endif

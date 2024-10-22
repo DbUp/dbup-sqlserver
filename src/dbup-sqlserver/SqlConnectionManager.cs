@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
-#if SUPPORTS_MICROSOFT_SQL_CLIENT
 using Microsoft.Data.SqlClient;
-#else
-using System.Data.SqlClient;
-#endif
 using DbUp.Engine.Transactions;
 using DbUp.Support;
 
@@ -24,7 +20,7 @@ namespace DbUp.SqlServer
                  var conn = new SqlConnection(connectionString);
 
                  if (dbManager.IsScriptOutputLogged)
-                     conn.InfoMessage += (sender, e) => log.WriteInformation($"{{0}}", e.Message);
+                     conn.InfoMessage += (sender, e) => log.LogInformation($"{{0}}", e.Message);
 
                  return conn;
              }))
