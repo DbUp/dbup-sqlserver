@@ -26,6 +26,7 @@ namespace DbUp.SqlServer.Helpers
         /// Initializes a new instance of the <see cref="TemporarySqlDatabase"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
+        /// <param name="instanceName">The name of the instance.</param>
         public TemporarySqlDatabase(string name, string instanceName) :
              this(new SqlConnectionStringBuilder($"Server={instanceName};Database={name};Trusted_connection=true;Pooling=false"))
         {

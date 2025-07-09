@@ -26,16 +26,19 @@ namespace DbUp.SqlServer
         {
         }
 
+        /// <inheritdoc/>
         protected override string GetInsertJournalEntrySql(string @scriptName, string @applied)
         {
             return $"insert into {FqSchemaTableName} (ScriptName, Applied) values ({@scriptName}, {@applied})";
         }
 
+        /// <inheritdoc/>
         protected override string GetJournalEntriesSql()
         {
             return $"select [ScriptName] from {FqSchemaTableName} order by [ScriptName]";
         }
 
+        /// <inheritdoc/>
         protected override string CreateSchemaTableSql(string quotedPrimaryKeyName)
         {
             return
