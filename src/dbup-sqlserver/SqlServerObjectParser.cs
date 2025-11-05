@@ -9,6 +9,9 @@ namespace DbUp.SqlServer
     /// </summary>
     public class SqlServerObjectParser : SqlObjectParser
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServerObjectParser"/> class.
+        /// </summary>
         public SqlServerObjectParser()
             : base("[", "]")
         {

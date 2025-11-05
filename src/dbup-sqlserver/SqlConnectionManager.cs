@@ -26,6 +26,7 @@ namespace DbUp.SqlServer
              }))
         { }
 
+        /// <inheritdoc/>
         public override IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
         {
             var commandSplitter = new SqlCommandSplitter();

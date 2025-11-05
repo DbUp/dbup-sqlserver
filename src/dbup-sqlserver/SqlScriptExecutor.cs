@@ -28,11 +28,13 @@ namespace DbUp.SqlServer
         {
         }
 
+        /// <inheritdoc/>
         protected override string GetVerifySchemaSql(string schema)
         {
             return string.Format(@"IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'{0}') Exec('CREATE SCHEMA [{0}]')", Schema);
         }
 
+        /// <inheritdoc/>
         protected override void ExecuteCommandsWithinExceptionHandler(int index, SqlScript script, Action executeCommand)
         {
             try
