@@ -1,1 +1,3 @@
 mode: Mainline
+ignore:
+  commits-before: 2024-11-06T00:00:00 # Simplify calculations by choosing a cutoff date from where no branches exist
