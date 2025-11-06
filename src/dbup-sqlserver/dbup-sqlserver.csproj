@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="dbup-core" Version="6.0.15" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
   </ItemGroup>
 
   <ItemGroup>
