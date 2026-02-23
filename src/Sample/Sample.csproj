@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\dbup-sqlserver\dbup-sqlserver.csproj" />
+    <ProjectReference Include="..\dbup-sqlserver\dbup-sqlserver.csproj" />
   </ItemGroup>
 
   <ItemGroup>
