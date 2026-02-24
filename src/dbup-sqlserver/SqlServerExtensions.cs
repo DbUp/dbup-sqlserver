@@ -35,13 +35,13 @@ public static class SqlServerExtensions
     /// Creates an upgrader for SQL Server databases.
     /// </summary>
     /// <param name="supported">Fluent helper type.</param>
-    /// <param name="connection">The sql connection.</param>
+    /// <param name="connectionFactory">A func that create a new SqlConnection</param>
     /// <returns>
     /// A builder for a database upgrader designed for SQL Server databases.
     /// </returns>
-    public static UpgradeEngineBuilder SqlDatabase(this SupportedDatabases supported, SqlConnection connection)
+    public static UpgradeEngineBuilder SqlDatabase(this SupportedDatabases supported, Func<SqlConnection> connectionFactory)
     {
-        return SqlDatabase(supported, connection, null);
+        return SqlDatabase(supported, connectionFactory, null);
     }
 
     /// <summary>
@@ -79,14 +79,14 @@ public static class SqlServerExtensions
     /// Creates an upgrader for SQL Server databases.
     /// </summary>
     /// <param name="supported">Fluent helper type.</param>
-    /// <param name="connection">The sql connection.</param>
+    /// <param name="connectionFactory">A func that create a new SqlConnection</param>
     /// <param name="schema">The SQL schema name to use. Defaults to 'dbo'.</param>
     /// <returns>
     /// A builder for a database upgrader designed for SQL Server databases.
     /// </returns>
-    public static UpgradeEngineBuilder SqlDatabase(this SupportedDatabases supported, SqlConnection connection, string schema)
+    public static UpgradeEngineBuilder SqlDatabase(this SupportedDatabases supported, Func<SqlConnection> connectionFactory, string schema)
     {
-        return SqlDatabase(new SqlConnectionManager(connection), schema);
+        return SqlDatabase(new SqlConnectionManager(connectionFactory), schema);
     }
 
     /// <summary>

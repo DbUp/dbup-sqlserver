@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using DbUp.Engine.Transactions;
@@ -15,22 +16,25 @@ namespace DbUp.SqlServer
         /// </summary>
         /// <param name="connectionString"></param>
         public SqlConnectionManager(string connectionString)
-            : this(new SqlConnection(connectionString))
-        { }
+            : this(() => new SqlConnection(connectionString))
+        {
+        }
 
         /// <summary>
         /// Manages Sql Database Connections using an existing connection.
         /// </summary>
-        /// <param name="connection">The existing SQL connection to use.</param>
-        public SqlConnectionManager(SqlConnection connection)
+        /// <param name="connectionFactory">A factory function that creates a new SQL connection.</param>
+        public SqlConnectionManager(Func<SqlConnection> connectionFactory)
             : base(new DelegateConnectionFactory((log, dbManager) =>
             {
+                var conn = connectionFactory();
                 if (dbManager.IsScriptOutputLogged)
-                    connection.InfoMessage += (sender, e) => log.LogInformation($"{{0}}", e.Message);
+                    conn.InfoMessage += (sender, e) => log.LogInformation("{0}", e.Message);
 
-                return connection;
+                return conn;
             }))
-        { }
+        {
+        }
 
         /// <inheritdoc/>
         public override IEnumerable<string> SplitScriptIntoCommands(string scriptContents)
